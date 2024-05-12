@@ -173,7 +173,7 @@ One limitation of the test in this paper is response rate, as the survey may be 
 #| warning: false
 #| message: false
 
-## demographics
+## demographics --> get the top 10 values by pct. of total, then order them
 demos = cr %>%
   select(`Job Field` = job_field, 
          `Job Type` = job_type, 
@@ -192,8 +192,10 @@ demos = cr %>%
 
 demos$name = factor(demos$name, levels = c('Job Field', 'Job Type', 'Birth location', 'Past Residence', 'Current Residence', 'Current Residence Type', 'Head of Household', 'Recent Job Search Start'))
 
+#filter NAs
 demos <- demos[6:56,]
 
+#Plot the data
 ggplot(demos , aes(y = factor(value), x = pct)) + 
   geom_col(fill = palette[9]) + 
   facet_wrap( ~name, scales = "free") + 
@@ -372,9 +374,13 @@ The first plot generally supports the veracity of my hypothesis by showing that 
 #table(dat$q8_baseline, dat$moved)
 
 models <- list()
+#Nicaraguan Migrant vs. Social Exclusion Hypothesis
 models[['Nicaraguan Migrant']] = lm(social_exclusion ~ nic, cr)
+#Inter-Community Contact vs. Social Exclusion Hypothesis
 models[['Inter-Community Contact']] = lm(social_exclusion  ~ contact, cr_nic)
+#Recent Migration vs. Social Exclusion Hypothesis
 models[['Recent Migration']] = lm(social_exclusion ~ rec_mig, cr_nic)
+#Head of Household vs. Social Exclusion Hypothesis
 models[['Head of Household']] = lm(social_exclusion ~ head_of_house, cr_nic)
 
 modelsummary(
@@ -394,6 +400,8 @@ While each independent variable's coefficient has a varying substantive magnitud
 #| echo: false
 #| warning: false
 #| message: false
+
+#Create a dataset just with non-Nicaraguan Central American migrants to Costa Rica
 cr = cr %>%
   mutate(ca = case_when(loc_birth == 3 ~ 1, loc_birth !=3 ~ 0))
 
@@ -402,10 +410,15 @@ cr_ca <- cr %>%
 
 #table(dat$q8_baseline, dat$moved)
 
+#Create a model for each hypothesis
 models <- list()
+#Non-Nicaraguan Migrant vs. Social Exclusion
 models[['Non-Nicaraguan Migrant']] = lm(social_exclusion ~ ca, cr)
+#Inter-Community Contact vs. Social Exclusion
 models[['Inter-Community Contact']] = lm(social_exclusion  ~ contact, cr_ca)
+#Recent Migration vs. Social Exclusion
 models[['Recent Migration']] = lm(social_exclusion ~ rec_mig, cr_ca)
+#Head of Household vs. Social Exclusion
 models[['Head of Household']] = lm(social_exclusion ~ head_of_house, cr_ca)
 
 modelsummary(
