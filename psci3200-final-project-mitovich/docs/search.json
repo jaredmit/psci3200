@@ -2,9 +2,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "psci3200-final-project-mitovich",
+    "title": "Final Report Expanded Research Design",
     "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
+    "text": "ChatGPT was used as a tool for assistance with this assignment."
   },
   {
     "objectID": "about.html",
@@ -12,5 +12,47 @@
     "title": "About",
     "section": "",
     "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "psci-3200-final-project.html",
+    "href": "psci-3200-final-project.html",
+    "title": "Final Report Expanded Research Design",
+    "section": "",
+    "text": "ChatGPT was used as a tool for assistance with this assignment."
+  },
+  {
+    "objectID": "psci-3200-final-project.html#social-exclusion-variables",
+    "href": "psci-3200-final-project.html#social-exclusion-variables",
+    "title": "Final Report Expanded Research Design",
+    "section": "Social Exclusion Variables",
+    "text": "Social Exclusion Variables\n\n\n\n\n\n\n\n\nIPM_E1\nIPM Education 1\nNon-attendance in formal education\n\n\nIPM_E2\nIPM Education 2\nEducational lag\n\n\nIPM_E3\nIPM Education 3\nNo high school attainment\n\n\nIPM_E4\nIPM Education 4\nLow development of human capital\n\n\nIPM_VUI1\nIPM Housing and internet use 1\nPoor condition of the roof or floor\n\n\nIPM_VUI2\nIPM Housing and internet use 2\nPoor condition of the exterior walls\n\n\nIPM_VUI3\nIPM Housing and internet use 3\nOvercrowding\n\n\nIPM_VUI4\nIPM Housing and internet use 4\nNo Internet use\n\n\nIPM_S1\nIPM Health 1\nWithout health insurance\n\n\nIPM_S2\nIPM Health 2\nNo water service\n\n\nIPM_S3\nIPM Health 3\nWithout elimination of excreta\n\n\nIPM_S4\nIPM Health 4\nNo Garbage Disposal\n\n\nIPM_T1\nIPM Job 1\nLong-term unemployment and discouraged people\n\n\nIPM_T2.1\nIPM Labor 2.1\nNon-compliance with minimum wage\n\n\nIPM_T2.2\nIPM Labor 2.2\nNon-compliance with other labor rights\n\n\nIPM_T3\nIPM Job 3\nInformal self-employment\n\n\nIPM_PS1\nIPM Social Protection 1\nEarly childhood without care\n\n\nIPM_PS2\nIPM Social Protection 2\nOlder adults without pension\n\n\nIPM_PS3\nIPM Social Protection 3\nPeople with disabilities without transfers\n\n\nIPM_PS4\nIPM Social Protection 4\nOut of the workforce due to family obligations"
+  },
+  {
+    "objectID": "psci-3200-final-project.html#regression-with-covariates",
+    "href": "psci-3200-final-project.html#regression-with-covariates",
+    "title": "Final Report Expanded Research Design",
+    "section": "Regression with Covariates",
+    "text": "Regression with Covariates\n\n\n\n\n\n\nNicaraguan Migrant\n Inter-Community Contact\nRecent Migration\nHead of Household\n\n\n\n\n(Intercept)\n2.609*** (0.013)\n1.999*** (0.040)\n1.947*** (0.035)\n2.162*** (0.044)\n\n\nnic\n−0.653*** (0.048)\n\n\n\n\n\ncontact\n\n−0.086* (0.042)\n\n\n\n\nrec_mig\n\n\n0.193 (0.160)\n\n\n\nhead_of_house\n\n\n\n−0.488*** (0.068)\n\n\nNum.Obs.\n30514\n2131\n2131\n2131\n\n\nR2 Adj.\n0.006\n0.001\n0.000\n0.023"
+  },
+  {
+    "objectID": "index.html#title-psci3200-final-project-mitovich",
+    "href": "index.html#title-psci3200-final-project-mitovich",
+    "title": "psci3200-final-project-mitovich",
+    "section": "title: “psci3200-final-project-mitovich”",
+    "text": "title: “psci3200-final-project-mitovich”\nThis is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2\n\n2+3\n\n[1] 5"
+  },
+  {
+    "objectID": "index.html#social-exclusion-variables",
+    "href": "index.html#social-exclusion-variables",
+    "title": "Final Report Expanded Research Design",
+    "section": "Social Exclusion Variables",
+    "text": "Social Exclusion Variables\n\n\n\n\n\n\n\n\nIPM_E1\nIPM Education 1\nNon-attendance in formal education\n\n\nIPM_E2\nIPM Education 2\nEducational lag\n\n\nIPM_E3\nIPM Education 3\nNo high school attainment\n\n\nIPM_E4\nIPM Education 4\nLow development of human capital\n\n\nIPM_VUI1\nIPM Housing and internet use 1\nPoor condition of the roof or floor\n\n\nIPM_VUI2\nIPM Housing and internet use 2\nPoor condition of the exterior walls\n\n\nIPM_VUI3\nIPM Housing and internet use 3\nOvercrowding\n\n\nIPM_VUI4\nIPM Housing and internet use 4\nNo Internet use\n\n\nIPM_S1\nIPM Health 1\nWithout health insurance\n\n\nIPM_S2\nIPM Health 2\nNo water service\n\n\nIPM_S3\nIPM Health 3\nWithout elimination of excreta\n\n\nIPM_S4\nIPM Health 4\nNo Garbage Disposal\n\n\nIPM_T1\nIPM Job 1\nLong-term unemployment and discouraged people\n\n\nIPM_T2.1\nIPM Labor 2.1\nNon-compliance with minimum wage\n\n\nIPM_T2.2\nIPM Labor 2.2\nNon-compliance with other labor rights\n\n\nIPM_T3\nIPM Job 3\nInformal self-employment\n\n\nIPM_PS1\nIPM Social Protection 1\nEarly childhood without care\n\n\nIPM_PS2\nIPM Social Protection 2\nOlder adults without pension\n\n\nIPM_PS3\nIPM Social Protection 3\nPeople with disabilities without transfers\n\n\nIPM_PS4\nIPM Social Protection 4\nOut of the workforce due to family obligations"
+  },
+  {
+    "objectID": "index.html#regression-with-covariates",
+    "href": "index.html#regression-with-covariates",
+    "title": "Final Report Expanded Research Design",
+    "section": "Regression with Covariates",
+    "text": "Regression with Covariates\n\n\n\n\n\n\nNicaraguan Migrant\n Inter-Community Contact\nRecent Migration\nHead of Household\n\n\n\n\n(Intercept)\n2.609*** (0.013)\n1.999*** (0.040)\n1.947*** (0.035)\n2.162*** (0.044)\n\n\nnic\n−0.653*** (0.048)\n\n\n\n\n\ncontact\n\n−0.086* (0.042)\n\n\n\n\nrec_mig\n\n\n0.193 (0.160)\n\n\n\nhead_of_house\n\n\n\n−0.488*** (0.068)\n\n\nNum.Obs.\n30514\n2131\n2131\n2131\n\n\nR2 Adj.\n0.006\n0.001\n0.000\n0.023"
   }
 ]

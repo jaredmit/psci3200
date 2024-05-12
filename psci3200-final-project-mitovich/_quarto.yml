@@ -7,9 +7,8 @@ website:
   navbar:
     left:
       - href: index.qmd
-        text: Home
-      - about.qmd
-
+        text: Final Project
+  
 format:
   html:
     theme: cosmo

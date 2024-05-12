@@ -1,0 +1,627 @@
+---
+title: "Final Report Expanded Research Design"
+author: "Jared Mitovich"
+
+institute: "University of Pennsylvania"
+date: last-modified
+toc: true
+
+bibliography: references.bib
+
+format: 
+  html:
+    self-contained: true
+
+editor: visual
+---
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+
+library(ggplot2)
+library(readr)
+library(ggdag)
+library(tidyverse)
+library(gt)
+library(modelsummary)
+library(hrbrthemes)
+library(flextable)
+require(gridExtra)
+
+# read in data
+cr <- read.csv("data/costarica.csv")
+
+# create color palette for plotting
+palette = MetBrewer::met.brewer(name = "Cross")
+
+# mutate the data
+cr <- cr %>%
+  mutate(social_exclusion = IPM_E1 * (1/20) + IPM_E2 * (1/20) + IPM_E3 * (1/20) + 
+         IPM_E4 * (1/20) + IPM_S1 * (1/20) + IPM_S2 * (1/20) + IPM_S3 * (1/20) + 
+         IPM_S4 * (1/20) + IPM_VUI1 * (1/20) + IPM_VUI2 * (1/20) + IPM_VUI3 * (1/20) + 
+         IPM_VUI4 * (1/20) + IPM_T1 * (2/30) + IPM_T2.1 * (1/30) + IPM_T2.2 * (1/30) + 
+         IPM_T3 * (2/30) + IPM_PS1 * (1/20) + IPM_PS2 * (1/20) + IPM_PS3 * (1/20) + 
+         IPM_PS4 * (1/20)) %>% # take the multidimensional poverty variables and weight
+  select(social_exclusion, 
+         A3, 
+         RamaEmpPri, 
+         OcupEmpPri, 
+         LugNac, 
+         RegResAnt, 
+         REGION, 
+         ZONA, 
+         D13C, 
+         C6B,
+         A13,
+         ipsbt) %>%
+  rename(social_exclusion = social_exclusion, # social exclusion
+         household_head = A3, # head of the household relationship
+         job_field = RamaEmpPri, # primary job field
+         job_type = OcupEmpPri, # primary job title
+         loc_birth = LugNac, # location of birth
+         loc_two_yrs = RegResAnt, # location two years ago
+         loc_curr = REGION, # location
+         loc_curr_type = ZONA, # location type (urban or rural)
+         rec_bonus = D13C, # received bonus in last twelve months
+         rec_job_search = C6B,# started job search in last four weeks
+         edu_attend = A13, #current education attendance
+         salary = ipsbt)
+```
+
+*ChatGPT was used as a tool for assistance with this assignment.*
+
+# 1. Introduction to the Research Question
+
+"Costa Ricans are just as racist against Nicaraguans as people in the U.S. are against, say, Mexicans---you import poor workers, and then you discriminate, because it justifies their exclusion and exploitation," one Nicaraguan migrant told a news source in 2022 (Zawodny 2022).
+
+The historic Costa Rica-Nicaragua migration pattern is one of the largest in Central and North America, yet it often gains little attention. In recent years, this pattern has exploded in size due to a loss of work, the repression of opposition, and the closure of nonprofits in Nicaragua. The influx comes as Costa Rica faces its highest unemployment in history, creating a structural dependence on Nicaraguans searching for work. While Costa Rica is a care receiving country, its perception as a haven among Nicaraguans and others has contributed to a culture of nationalism that, in recent years, sparked the first anti-immigration rally in Costa Rica's recent history and a cracking down on the ability to gain a temporary work permit versus asylum. These bureaucratic, social, and academic experiences have contributed to a psychological effect on Nicaraguans in the country --- including feelings of social exclusion.
+
+My research question is whether inter-community contact, recency of migration, and heading a household can predict social exclusion among migrants. This research question is interesting because, as demonstrated in the summary of the state of scholarly research, there is a gap in research about migrant exclusion --- and specifically, the particular variables that are correlated with migrant exclusion in Central America. In particular, an under-researched topic is feelings of exclusion among what this paper calls "neighbor country migrants": Migrants who are originally from a neighboring country. This paper takes existing research on these topics a step further by producing the first reliable account of how three factors --- inter-community contact, recency of migration, and the heading of a household --- have impacted the social exclusion felt by migrants since the latest wave of Nicaraguans arrived in Costa Rica.
+
+There has already been extensive research on the behaviors of migrants after they arrive in their new country, and how their new country responds to their presence. In addition, the Costa Rica-Nicaragua migration pattern represents two countries with clear push and pull factors, creating an economic equilibrium as discussed in class this semester with other migration patterns. This paper defines social exclusion as feelings of social disadvantage and relegation to fringe elements of society. It is first important to understand how scholarly research on the factors influencing social exclusion in Central America has gained momentum in recent years. This reflects a growing recognition of the complex dynamics shaping the region's social landscape. While some of these studies do not directly address migration, many are about exclusion, and this final project seeks to show how such findings and insights also apply to migrants --- particularly those migrating from Nicaragua to Costa Rica.
+
+First, one study by Benería and Floro (2016) discusses the gendered dimensions of social exclusion, highlighting how patriarchal structures perpetuate inequalities, particularly in access to education and employment opportunities. As a result, this perpetuates women's exclusion from economic and social spheres. Second, research by Pérez-Armendáriz and Crow (2017) highlights the role of political institutions in perpetuating social exclusion, particularly through corruption and clientelism, which undermine the rule of law and exacerbate inequalities in access to justice and public services. This underscores the interconnectedness of political and socio-economic 0factors in shaping patterns of exclusion in the region.Third, studies by Barcena et al. (2016) shed light on the intersectionality of social exclusion, examining how factors such as ethnicity, migration status, and geographic location intersect to compound vulnerabilities and deepen exclusionary processes. Such research underscores the importance of adopting an intersectional lens to understand the multifaceted nature of social exclusion in Central America.
+
+Research similar to that of Barcena et al. --- which specifically analyzes the behaviors of migrants after they arrive in their new country, and how their new country responds to their presence --- is extensive yet somewhat less prominent. For example, one piece of existing research found support for an increased need for social inclusion among refugees. Meanwhile, another piece of existing research demonstrates that familial relationships are "crucial" for the mental well-being of immigrants of older age, due to their ability to provide stress or support (Lobel et al 2022, Jang et al. 2021). Another 2015 paper from FLASCO-Costa Rica focuses on the rapid urbanization of Latin America, but contextualizes this within social exclusion and its correlationary effects. For example, the paper --- which studies urban areas in Costa Rica and El Salvador but does not apply a specific focus on migrants or non-migrants --- finds that social exclusion is correlated with growth of the "informal economy," and "pervasive violence." This paper is informative as it highlights how urban areas may already have more social exclusion than rural areas in Costa Rica, and the effects of this may be of disparate magnitudes --- potentially demonstrating the value of controlling for neighborhood type such as urban, suburban, rural, etc. (American University).
+
+There has been some research already on the relationship between neighbor country migration and social exclusion, but it is mostly centered on the root causes that prompt migrants to move to a neighboring country --- not what happens when they get there.
+
+While one paper on childhood and migration in Central and North America does not discuss Costa Rica and instead focuses on migration to countries like the United States, it underscores that many migrants --- particularly children --- leaving countries in Central America are doing so because a number of root causes, which include social exclusion (Musalo et al. 2015) . Thus, it is important to consider levels of social exclusion among Nicaraguan migrants in Costa Rica within the context of pervasive social exclusion being a root cause or a "push factor" for migration in other Central American countries. Journalistic reports localized to Central America and Costa Rica have also highlighted the effect of media portrayals and the results of the recent influx of Nicaraguans to the country.
+
+# 2. Theory and Hypotheses
+
+The hypotheses of this paper are based on a refined version of the research question, in an attempt to state a specific relationship that one would expect to see regarding Nicaraguan migrants in Costa Rica. This section will explain each hypothesis along with the underlying intuition based on existing research, logic, and theory.
+
+First, we hypothesize that social exclusion among Nicaraguan migrants in Costa Rica is more significant than social exclusion than social exclusion among the entire population of Costa Rica. There are multiple reasons why one would expect to see this relationship.
+
+Second, we hypothesize that social exclusion among Nicaraguan migrants in Costa Rica is correlated with inter-community contact. This paper defines inter-community contact as an indexed measurement of the percentage of Nicaraguan migrants in the location of the household survey respondent, combined with the percentage of Nicaraguan migrants in the job field of the household survey respondent. There are multiple reasons why one would expect to see this relationship. Many Nicaraguan migrants have immigrated to Costa Rica because of the country's superior economy. Two major drivers of Costa Rica's economy are tourism and coffee. Because of the high demand for low-wage workers among both of these drivers, many Nicaraguan migrants easily settle into seasonal tourism or coffee farming jobs. However, these jobs tend to be located in more rural parts of the country, primarily in the north and west which are closer to the Nicaraguan border. They are not concentrated in San Jose, the area of Costa Rica with the highest neighborhood density. As a result, we hypothesize that Nicaraguan migrants will report less social exclusion in lower density and rural areas, given that the industries that depend on their labor the most are concentrated in these lower density and rural areas. This would imply a positive correlation between neighborhood density and Nicaraguan social exclusion.
+
+In addition, research and reports previously cited suggest that Costa Rica is somewhat neatly divided into areas with low, medium, and high migrant populations. In the areas with low migrant populations, migrants do not see other migrants that often, and they are presumably viewed as out of place compared to other longtime residents. However, the migrant community in these locales is tight knit, wherein everyone knows everyone and shares a common purpose, industry, or relationship. Therefore, social exclusion is low. In the areas with high migrant populations, migrants have transformed such locales into immigrant cities, making their identity central to the city itself. There is likely inter-group social exclusion, but by and large, social exclusion in these locales is also low. Thus, this leaves us with areas with medium --- neither low nor high --- percentages of migrants. Because these "middle' regions have neither achieved full immigrant city statuses, and the presence of migrants is not notable enough to cause a response or anti-immigrant sentiment from neighboring natives, it would thus follow that social exclusion is the highest here.
+
+Third, we hypothesize that social exclusion among Nicaraguan migrants in Costa Rica is correlated with recency of migration. There are multiple reasons why one would expect to see this kind of relationship. First, Costa Rica is a welfare state, and support for the government is strong. The government is generally seen as a provider of necessary resources for a good life in Costa Rica. However, this is not the case in Nicaragua, where the government is viewed to be more authoritarian and has taken on characteristics of a dictatorship. This means that migrants moving from Nicaragua to Costa Rica are entering a completely different system of government. Moreover, because of this clash of "government cultures," Costa Rica and its people are highly protective of their welfare. Only in recent years, Costa Rica's government has taken on a more stringent response toward recent migration patterns, including that between Nicaragua and Costa Rica. Because Costa Rica's government has high favorability, this means that Costa Ricans also increasingly support this stringent response toward immigration --- even if, paradoxically, they rely on migrant labor. Therefore, we propose a reasonable assumption that those who migrated from Nicaragua to Costa Rica more recently feel more social exclusion given that they directly entered a country that is gradually becoming more hostile to neighbor country immigration. This would imply a positive correlation between government support and Nicaraguan social exclusion.
+
+Fourth, we hypothesize that social exclusion among Nicaraguan migrants in Costa Rica is negatively correlated with migrants who are the head of their household. There are multiple reasons why one would expect to see this kind of relationship. First, news reports suggest that living in a neighborhood with Nicaraguan immigrants has helped build community in otherwise hostile areas of Costa Rica; those who head the household are more likely to be connected to their communities and of older age, meaning it is probable they have spent more time in the country building social ties. In addition, those who lead the household likely made the most sacrifice to take their family to a new country. It is these people who have likely most successfully employed an ethic of hard work and independence, described as pulseándola by Nicaraguans, and thus have achieved the most social inclusion in a new country.
+
+# 3. Research Design
+
+The dataset which I am using to conduct my analysis is Costa Rica's National Household Surveys for [2023](http://sistemas.inec.cr/pad5/index.php/catalog/319/data-dictionary/F4?file_name=GPES-ELAB-GEBD-ENAHO-2023_BdBasePublica), which is a sample survey conducted by the National Institute of Statistics and Census of Costa Rica. The units of analysis are homes and the members of the household within the home. The sample is based on housing sampling frames, an instrument which allows for a very approximate measure of the probabilities of a given household's selection for participation in the survey. Each unit of the housing sampling frame is defined as a primary sampling unit, which is a geographical area into which each district of the country is divided and which contain an average of 150 homes in urban zones and an average of 100 homes in rural zones. The selection of the sample was carried out in two stages. In the first stage, primary sampling units were selected with a probability proportional to the size of the unit, and in the second stage, within each primary sampling unit, homes were selected with equal probabilities of selection, through systematic sampling with random bootstrapping.
+
+One limitation that readers should be aware of is that the survey is not a census; it does not capture the entirety of the Costa Rican population. It is also a government survey, meaning that the results were not necessarily used as part of a broader agenda beyond measuring household sentiment and collecting data about the populace. Second, an expansion factor was applied in the study to "obtain a population estimate," which means that the sample was affected by weighting. Finally, the sample was random, but randomness is not perfect; unlike what was discussed in class with migration, it does not explicitly highlight the push or pull factors that may have motivated Nicaraguans to go to Costa Rica, so it is difficult to fully attribute any hypothesis results to why the migrants came to Costa Rica in the first place. That said, it is evident that Costa Rica has a number of pull factors that are measurable and distinct in the survey.
+
+There are three categories of variables that this paper uses to test the hypotheses: Variables related to migrant status, variables that drive each hypothesis, and variables related to social exclusion.
+
+The first category of variables are related to migrant status. These variables include loc_birth and loc_two_yrs, which correspond, respectively to a survey unit's place of birth and place of residence two years ago. These variables will allow me to filter my data to Nicaraguan migrants, migrants from other Central American countries, and native Costa Ricans. They will also allow me to compare Nicaraguan migrants who migrated over two years ago to those who migrated to Costa Rica within the past two years. As a result, we can better understand whether Nicaraguan migrants feel more social exclusion at a statistically significant difference compared to the Costa Rican population as a whole.
+
+The second category of variables are related to this paper's hypotheses. The first hypothesis is in regards to social exclusion disparities between Nicaraguans and the Costa Rican population overall. To measure social exclusion, this paper used a measure correlated with the measures of multidimensional poverty present in the survey, labeled with IPM and included in an appendix at the end of the paper. These variables were combined and weighted to create a social_exclusion variable. loc_birth was used to compare Nicaraguan migrants to the Costa Rica population overall. The second hypothesis is in regards to inter-community contact. This hypothesis was strictly conducted among a sub-sample of Nicaraguan migrants in the survey. To measure inter-community contact, this paper combined and indexed two variables present in the survey: loc_curr and job_field. First, a categorical version of loc_curr was created to define whether an individual survey unit fell into a loc_curr that had a high proportion of Nicaraguans, medium proportion of Nicaraguans, or low proportion of Nicaraguans relative to the entire country. Then, a categorical version of job-field was created to determine whether an individual survey unit fell into a job_field that had a high proportion of Nicaraguans, medium proportion of Nicaraguans, or low proportion of Nicaraguans relative to the entire country. Finally, these variables were aggregated using a z-score index and combined into an index called contact. The third hypothesis is in regards to recency of migration. This hypothesis was strictly conducted among a sub-sample of Nicaraguan migrants in the survey. To measure recency of migration, loc_two_yrs was used for the creation of a binary variable, rec_mig, which indicates whether a migrant lived in Costa Rica two years ago (rec_mig = 0) or Nicaragua (rec_mig = 1) two years ago. The fourth hypothesis is in regards to the head of the household. This hypothesis was strictly conducted among a sub-sample of Nicaraguan migrants in the survey. To measure whether an individual survey unit was the head of the household, household_head was used for the creation of a binary variable which indicates where the individual survey unit had a relationship to the head of the household (house_head = 0), or if they were the head of the household themselves (house_head = 1). By using these variables, we can better understand the specific factors that may drive social exclusion among Nicaraguan migrants, and how they may depend on the changing political climate toward migrants in Costa Rica.
+
+The third and final category variables are related to this paper's index for social exclusion. This index provides a reliable measure of the magnitude of a respondent's sentiments of social exclusion. The variables that compose the social exclusion index are derived from the household survey's measure of multidimensional poverty. The variables used to create the survey's measure of multidimensional poverty were added and weighted to create a summation variable titled social_exclusion. The multidimensional poverty variables are included in an appendix at the end of this paper. These variables will provide a reliable, standard measure of social exclusion across the paper in line with international measurements of multdimensional poverty, social exclusion, and similar indeces --- providing the ability for a theoretical comparison with other countries and research there.
+
+Below is a table that visualizes the mean, range, and standard deviation of all of the variables mentioned above.
+
+```{r}
+#| echo: false
+#| warning: false
+
+variables <- c("social_exclusion", "household_head", "job_field", "job_type", "loc_birth", "loc_two_yrs", "loc_curr", "loc_curr_type", "rec_bonus", "rec_job_search", "edu_attend")
+
+results <- data.frame(Variable = character(), Mean = numeric(), Range = character(), StandardDeviation = numeric(), stringsAsFactors = FALSE)
+
+# Loop through variables
+for(var in variables) {
+  # Calculate mean
+  mean_val <- mean(cr[[var]], na.rm = TRUE)
+  
+  # Calculate range
+  range_val <- paste0(min(cr[[var]], na.rm = TRUE), " - ", max(cr[[var]], na.rm = TRUE))
+  
+  # Calculate standard deviation
+  std_dev_val <- sd(cr[[var]], na.rm = TRUE)
+  
+  # Append results to data frame
+  results <- rbind(results, data.frame(Variable = var, Mean = mean_val, Range = range_val, StandrdDeviation = std_dev_val, stringsAsFactors = FALSE))
+}
+
+flex_table <- flextable(results)
+
+# Set column names
+
+# Print the flextable
+flex_table
+
+```
+
+To test this paper's hypotheses, a linear regression model was used of the following form:
+
+$$
+Y_i = \alpha + \beta x_i+\epsilon_i
+$$
+
+Within this regression model, I considered multiple covariates, including loc_curr_type, which I considered using to control for the potential confounding nature of living in a rural versus an urban area, which may also contribute to feelings of social exclusion and offset the results of the inter-community contact index. The second covariate I considered using is edu_attend, or formal education attendance. I considered using this covariate to control for the potential confounding nature of job_type, because people in school may be more likely to not have a job. However, upon consideration of the variables that compose my social exclusion, I determined that treating these variables as covariates would offset the results of my regression, given that both covariates would have clear relationships with the variables composing the social regression index. For example, for loc_curr_type, internet use, water service, and overcrowding are all variables measured in the social exclusion index --- and each of these logically has a relationship with whether a locale is urban or rural. For edu_attend, high school attainment, education lag, and non-attendance in formal education are all variables measured in social exclusion index --- and each of these logically has a relationship with the level of schooling a unit in the survey currently has. For informative purposes, I have attached a regression with these variables as covariates to my appendix.
+
+While I hypothesize a causal relationship between my variables and social exclusion, there are two threats to interpreting the coefficient on my primary independent variable, social exclusion, as an estimate of a correlatory effect on the outcome. First, the survey was not fielded directly to measure social exclusion, but it does measure a multi-dimensional poverty index which this paper used as the baseline for its social exclusion measure. Second, there is no direct measure of all individual respondents, but rather, the survey data used is an aggregate form at the household unit level, which means that some respondents may be excluded to create an overall representative sample of households.
+
+Two potential unobserved confounders are the type of people completed this survey --- new Nicaraguan migrants may be less familiar with government services and how to complete such a survey --- and the response rate as a whole --- as the respondents may tilt toward those who are pro-government since this is a government survey.
+
+One limitation of the test in this paper is response rate, as the survey may be more likely to be completed by those with access to government services and educated on initiatives like the household survey. Another limitation of the test in this paper is that many Nicaraguan migrants are undocumented and may be hesitant to the complete a survey if it requires any sort of government identification. Given that three of the four hypotheses are restricted to migrants from Nicaragua, an empirical extension that adds credibility to this paper's inference is an additional, identical analysis among households with members originating from other Central America countries. This allows us to rule out the confounder of whether Nicaraguan migrants are particularly disproportionately over- or under-represented in the survey sample, because it allows us to compare the hypothesis test results to another neighboring country. Through this empirical extension, we will also be able to understand if there is a path to generalize my results to neighboring country migration patterns more broadly, or if the results are more likely to be unique to Nicaraguan migrants. Overall, this extension will create more confidence in the ability of the test to answer our research question, because it serves the purpose of providing a counter-weight and secondary result that can be used as a benchmark against the main results.
+
+*Note: All variables in the survey were numerically coded. See the full coding in the appendix.*
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+## demographics
+demos = cr %>%
+  select(`Job Field` = job_field, 
+         `Job Type` = job_type, 
+         `Birth Location` = loc_birth, 
+         `Past Residence` = loc_two_yrs, 
+         `Current Residence` = loc_curr,
+         `Current Residence Type` = loc_curr_type,
+         `Head of Household` = household_head,
+         `Recent Job Search Start` = rec_job_search) %>% 
+  pivot_longer(everything()) %>% 
+  group_by(name, value) %>% 
+  tally() %>% 
+  na.omit() %>%
+  mutate(pct = n/sum(n)) %>% 
+  top_n(n = 10, wt = pct)
+
+demos$name = factor(demos$name, levels = c('Job Field', 'Job Type', 'Birth location', 'Past Residence', 'Current Residence', 'Current Residence Type', 'Head of Household', 'Recent Job Search Start'))
+
+demos <- demos[6:56,]
+
+ggplot(demos , aes(y = factor(value), x = pct)) + 
+  geom_col(fill = palette[9]) + 
+  facet_wrap( ~name, scales = "free") + 
+  scale_y_discrete(labels = scales::label_wrap(30)) + 
+  hrbrthemes::scale_x_percent(limits = c(0, 0.7)) + 
+  labs(x = "Percent of respondents", y = NULL, 
+       title = "Characteristics of baseline respondents", 
+       subtitle = glue::glue("Number of respondents = {scales::comma(nrow(df))}"))
+
+```
+
+# 4. Findings
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+# high migrant area calculation
+
+cr = cr %>%
+  mutate(nic = case_when(loc_birth == 2 ~ 1, loc_birth !=2 ~ 0))
+
+
+# Assuming 'cr' is your dataset
+# Replace 'cr' with your actual dataset name
+
+# Define thresholds for high, medium, and low percentage of Nicaraguan migrants
+high_threshold_loc <- 0.10
+medium_threshold_loc <- 0.05
+
+# Mutate 'cr' to add a new column indicating the percentage of Nicaraguan migrants in each area
+cr <- cr %>%
+  group_by(loc_curr) %>%
+  mutate(nic_percentage_loc = mean(nic)) %>%
+  ungroup() %>%
+  mutate(
+    nic_level_loc = case_when(
+      nic_percentage_loc > high_threshold_loc ~ "High",
+      nic_percentage_loc > medium_threshold_loc ~ "Medium",
+      TRUE ~ "Low"
+    )
+  )
+
+# Define thresholds for high, medium, and low percentage of Nicaraguan migrants in job fields
+high_threshold_job <- 0.16
+medium_threshold_job <- 0.08
+
+# Mutate 'cr' to add a new column indicating the percentage of Nicaraguan migrants in each job field
+cr <- cr %>%
+  group_by(job_field) %>%
+  mutate(nic_percentage_job = mean(nic)) %>%
+  ungroup() %>%
+  mutate(
+    nic_level_job = case_when(
+      nic_percentage_job > high_threshold_job ~ "High",
+      nic_percentage_job > medium_threshold_job ~ "Medium",
+      TRUE ~ "Low"
+    )
+  )
+
+cr <- cr %>%
+  mutate(rec_mig = case_when(loc_two_yrs == 7 ~ 1, loc_birth != 7 ~ 0)) %>%
+  mutate(head_of_house = case_when(household_head == 1 ~ 1, household_head !=1 ~ 0))
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+cr$nic_level_loc_num <- recode(cr$nic_level_loc, "Low" = 1, "Medium" = 2, "High" = 3)
+cr$nic_level_job_num <- recode(cr$nic_level_job, "Low" = 1, "Medium" = 2, "High" = 3)
+
+# Extract variables for additive index
+index_vars <- cr[, c("nic_level_loc_num", "nic_level_job_num")]
+z_score = function(x, y){
+  # calculate mean and sd of control group
+  c_mean = mean( as.numeric( unlist(x[, y])) , na.rm = T)
+  c_sd = sd( as.numeric( unlist(x[, y])) , na.rm = T)
+  # subtract control group mean; divide by control group SD
+  ( as.numeric(x[, y, drop = TRUE]) - c_mean) / c_sd
+}
+
+index_vars <- c("nic_level_loc_num","nic_level_job_num")
+
+# calculate z-scores
+for (i in index_vars) {
+  cr[,i] = z_score(cr, i)
+}
+
+# Calculate all the average z-scores
+cr = cr %>% 
+  rowwise() %>% 
+  mutate(contact = mean(c_across(all_of(index_vars)), na.rm = TRUE)) %>% 
+  ungroup()
+
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+cr = cr %>%
+  mutate(nic = case_when(loc_birth == 2 ~ 1, loc_birth !=2 ~ 0))
+
+cr_nic <- cr %>%
+  filter(loc_birth == 2) # filter down to Nicaraguan migrants only
+
+
+#Plot 1
+social_exclusion_means <- cr %>%
+  group_by(nic) %>%
+  summarise(mean_social_exclusion = mean(social_exclusion, na.rm = T))
+
+# Convert variable to factor for better plotting
+social_exclusion_means$nic <- factor(social_exclusion_means$nic, levels = c(0, 1), labels = c("Non-Nicaraguan", "Nicaraguan"))
+
+# Create the bar plot
+plot1 <- ggplot(social_exclusion_means, aes(x = nic, y = mean_social_exclusion, fill = nic)) +
+  geom_bar(stat = "identity", position="dodge") +
+  labs(x = "Nicaraguan Migrant Status", y = "Mean Social Exclusion",
+       caption = "Notes: Social exclusion index based on multi-poverty index for the \n
+       2023 National Costa Rica Household Survey for (a) Nicaraguan migrants in \n
+       Costa Rica and (b) non-Nicaraguan Migrants.") +
+  scale_fill_discrete(name = "Status") + 
+  theme(plot.caption = element_text(hjust = 40)) + 
+  theme_minimal()
+
+plot1
+
+#Plot 2
+plot2_means <- cr %>%
+  group_by(loc_curr) %>%
+  summarise(mean_social_exclusion = mean(social_exclusion, na.rm = T))
+
+# Convert variable to factor for better plotting
+plot2_means$loc_curr <- factor(plot2_means$loc_curr, levels = c(1,2,3,4,5,6), labels = c("Central", "Chorotega", "Central Pacific", "Brunca","Huetar Atlantica","North Huetar"))
+
+# Create the bar plot
+plot2 <- ggplot(plot2_means, aes(x = loc_curr, y = mean_social_exclusion, fill = loc_curr)) +
+  geom_bar(stat = "identity", position="dodge") +
+  labs(x = "Current Region", y = "Mean Social Exclusion",
+       caption = "Notes: Social exclusion index based on multi-poverty index \n
+       for the 2023 National Costa Rica Household Survey observed in each region of Costa Rica.") +
+  scale_fill_discrete(name = "Region") + 
+  theme(plot.caption = element_text(hjust = 40)) + 
+  theme_minimal()
+
+plot2
+
+#Plot 3
+plot3_means <- cr_nic %>%
+  group_by(nic_level_loc) %>%
+  summarise(mean_social_exclusion = mean(social_exclusion, na.rm = T))
+
+# Create the bar plot
+plot3 <- ggplot(plot3_means, aes(x = nic_level_loc, y = mean_social_exclusion, fill = nic_level_loc)) +
+  geom_bar(stat = "identity", position="dodge") +
+  labs(x = "Region by Percentage of Nicaraguan Migrants", y = "Mean Social Exclusion",
+       caption = "Notes: Social exclusion index among Nicaraguan migrants, based on multi-poverty index \n
+       for the 2023 National Costa Rica Household Survey for (a) regions with high proportion of \n
+       Nicaraguans, (b) regions with medium proportion of Nicaraguans, and (c) regions with high proportion \n
+       of Nicaraguans.") +
+  scale_fill_discrete(name = "Percentage") + 
+  theme(plot.caption = element_text(hjust = 40)) + 
+  theme_minimal()
+
+plot3
+```
+
+The first plot generally supports the veracity of my hypothesis by showing that Nicaraguan migrants experience social exclusion at a higher level than non-Nicaraguan migrants in Costa Rica, providing a good support for diving deeper into the reasons that may contribute to this disparity. The second plot generally supports the veracity of my hypothesis by showing that there are differences in social exclusion by region, which could suggest a disparity driven by local migrant populations. Finally, the third plot contradicts the veracity of my hypothesis by showing that areas with low local populations of Nicaraguan migrants have the lowest social exclusion among Nicaraguan migrants, and vice versa for areas with high local populations of Nicaraguan migrants. I believed that areas with high concentrations of migrants would feel less exclusion because of the size of the community, and that areas with low concentrations of migrants would experience more exclusion because of the disproportionate size of the community compared to non-migrants; however, this is evidently not the case.
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#table(dat$q8_baseline, dat$moved)
+
+models <- list()
+models[['Nicaraguan Migrant']] = lm(social_exclusion ~ nic, cr)
+models[['Inter-Community Contact']] = lm(social_exclusion  ~ contact, cr_nic)
+models[['Recent Migration']] = lm(social_exclusion ~ rec_mig, cr_nic)
+models[['Head of Household']] = lm(social_exclusion ~ head_of_house, cr_nic)
+
+modelsummary(
+  models,
+  estimate  = "{estimate}{stars} ({std.error})",
+             statistic = NULL,
+  gof_omit = 'IC|RMSE|Log|F|R2$|Std.')
+```
+
+The findings correlate with the magnitudes of the variables in my regression model. In each case, social exclusion --- the dependent variable --- ranges from 0 to 0.51. For the "Nicaraguan Migrant" regression, the variable measuring whether a unit is a Nicaraguan migrant is binary, i.e. 0 or 1, so the magnitude of the effect is positive and somewhat large, with a 1-unit increase in the Nicaraguan migrant variable contributing to a 0.071 increase in social exclusion. For the "Inter-Community Contact" regression, the index variable measuring inter-community contact ranges from -14.7 to 2.08, and the magnitude of the effect is positive and somewhat smaller, with a 1-unit increase in inter-community contact contributing to a 0.018 increase in social exclusion. For the "Recent Migration" regression, the variable measuring whether a migrant recently moved to Costa Rica is binary, and the magnitude of the effect is positive and comparatively large, with a 1-unit increase in recent migration (moved recently = 1) contributing to a 0.085 increase in social exclusion. Finally, for the "Head of Household" regression, the variable measuring whether a migrant is the head of a household is binary, and the magnitude of the effect is negative and comparatively small, with a 1-unit increase in head of household (head of household = 1) contributing to a 0.027 decrease in social exclusion. Overall, the magnitude of these effects correspond with our understanding of a significant magnitude discussed in class this semester.
+
+While each independent variable's coefficient has a varying substantive magnitude, each independent variable has a statistically significant relationship with social exclusion at the level of p=0.01. Each relationship is supportive of the hypothesis. That said, the r-squared for each independent variable's coefficient is extremely small, casting doubt on the true correlation between these variables.
+
+# 5. Empirical Extension
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+cr = cr %>%
+  mutate(ca = case_when(loc_birth == 3 ~ 1, loc_birth !=3 ~ 0))
+
+cr_ca <- cr %>%
+  filter(loc_birth == 3) # filter down to migrants from other Central American countries
+
+#table(dat$q8_baseline, dat$moved)
+
+models <- list()
+models[['Non-Nicaraguan Migrant']] = lm(social_exclusion ~ ca, cr)
+models[['Inter-Community Contact']] = lm(social_exclusion  ~ contact, cr_ca)
+models[['Recent Migration']] = lm(social_exclusion ~ rec_mig, cr_ca)
+models[['Head of Household']] = lm(social_exclusion ~ head_of_house, cr_ca)
+
+modelsummary(
+  models,
+  estimate  = "{estimate}{stars} ({std.error})",
+             statistic = NULL,
+  gof_omit = 'IC|RMSE|Log|F|R2$|Std.')
+
+
+#Among nic migrants, these factors:
+#lm(social_exclusion ~ high_migrant_area)
+#lm(social_exclusion ~ high_migrant_area)
+
+```
+
+The findings correlate with the magnitudes of the variables in my regression model. In each case, social exclusion --- the dependent variable --- ranges from 0 to 0.51. For the "Non-Nicaraguan Migrant" regression, the variable measuring whether a unit is a non-Nicaraguan, Central American migrant is binary, i.e. 0 or 1, so the magnitude of the effect is negative and very small, with a 1-unit increase in the migrant variable contributing to a 0.009 decrease in social exclusion. For the "Inter-Community Contact" regression, the index variable measuring inter-community contact ranges from -14.7 to 2.08, and the magnitude of the effect is positive and somewhat small, with a 1-unit increase in inter-community contact contributing to a 0.011 increase in social exclusion. For the "Recent Migration" regression, the variable measuring whether a migrant recently moved to Costa Rica is binary, and the magnitude of the effect is negative and comparatively larger, with a 1-unit increase in recent migration (moved recently = 1) contributing to a 0.020 decrease in social exclusion. Finally, for the "Head of Household" regression, the variable measuring whether a migrant is the head of a household is binary, and the magnitude of the effect is negative and very small, with a 1-unit increase in head of household (head of household = 1) contributing to a 0.009 decrease in social exclusion. Overall, the magnitude of these effects correspond with our understanding of a significant magnitude discussed in class this semester.
+
+Each independent variable's coefficient has a varying substantive magnitude. However, none of the independent variables has a statistically significant relationship with social exclusion at the level of p=0.05. In addition, the r-squared for each independent variable's coefficient is extremely small. The results of this hypothesis test suggest that the hypothesis applies distinctly to Nicaraguan migrants to Costa Rica, rather than migrants who moved to Costa Rica from other Central American countries.
+
+# 6. Discussion and Policy Implications
+
+My results are somewhat conclusive that there is a unique pattern of social exclusion developing among Nicaraguans in Costa Rica, particularly among those who have migrated during a wave of increased hostility and nationalism in their destination country. The strong evidence for my hypothesis includes the statistically significant relationships between my independent variables and social exclusion. Moreover, my research failed to produce statistically significant results during an identical test where Nicaraguan migrants were substituted for other Central American migrants, suggesting that the relationship my research uncovered is unique to the Nicaragua-Costa Rica migration pattern. However, the lack of an R-squared of significant magnitude for any of my hypotheses suggests that this relationship is worth further examination and research. Because of the disparity between results for Nicaraguan migrants and other Costa Rican migrants, my research question is inconclusive as to whether inter-community contact, recency of migration, and heading a household can predict social exclusion among migrants overall.
+
+That said, evidence for this specific --- and significant --- relationship between certain variables and social exclusion among Nicaraguan migrants to Costa Rica is important and has numerous policy implications. First, these results suggest that the 2021 policy change that restricted asylum access for Nicaraguans could plausibly be having an affect on the overall social psyche of the Nicaraguan migrant populace, given that migrants who moved in the past two years are statistically correlated with higher social exclusion. In addition, the positive relationship between inter-community contact and social exclusion suggests that Nicaraguan migrants may struggle with rebuilding community after making sacrifice and facing difficult choices in leaving their home country for a new destination; being around others who have faced plenty of hardship may be pulling down the community as a whole. Finally, the sentiments of less social exclusion among those who lead their household suggests that the opportunity for taking on roles requiring strength and resilience could be an inhibiting or mitigating factor for the social exclusion that the population of Nicaraguan migrants as a whole is experiencing. This likely correlates to the lack of high-paying or high-stature jobs available to Nicaraguan migrants due to systemic factors. A disproportionately high number of Nicaraguans work as security guards and in sectors like agriculture and construction, while disproportionately few work in leadership positions and other white collar jobs (Zawodny 2022).
+
+Future research could provide stronger evidence for a temporal trend in increasing social exclusion among Nicaraguans in Costa Rica. Most importantly, the government of Costa Rica should work diligently to maintain the country's core identity as a haven, providing support to those who need it and those who offer something beneficial to the country's identity. Costa Rica should also work to provide opportunities for upward mobility for migrants, leveraging its status as one of the countries with the most stable democracies in the Central America to help those who have faced government oppression in neighboring regions of the continent.
+
+# 7. Appendix
+
+### Hypothesis Variables
+
+**job_type**
+
+|     |                                                     |
+|-----|-----------------------------------------------------|
+| 1   | Directors and managers                              |
+| 2   | Scientific and intellectual professionals           |
+| 3   | Technicians and mid-level professionals             |
+| 4   | Administrative support staff                        |
+| 5   | Service workers and business salespeople            |
+| 6   | Farmers and skilled agricultural workers, forests   |
+| 7   | Officers, operators and artisans of mechanical arts |
+| 8   | Facility and machine operators and assemblers       |
+| 9   | Elementary occupations                              |
+| 10  | Not well specified                                  |
+
+**job_field**
+
+|     |                                                                           |
+|-----------------|-------------------------------------------------------|
+| 1   | Agriculture, forestry and fishing                                         |
+| 2   | Exploitation of mines and quarries                                        |
+| 3   | Manufacturing industries                                                  |
+| 4   | Supply of electricity, gas, steam and air conditioning                    |
+| 5   | Water supply; wastewater evacuation, waste management and decontamination |
+| 6   | Construction                                                              |
+| 7   | Wholesale and Retail; repair of motor vehicles and motorcycles            |
+| 8   | Transportation and storage                                                |
+| 9   | Accommodation and meal service activities                                 |
+| 10  | Information and communications                                            |
+| 11  | Financial and insurance activities                                        |
+| 12  | Real estate activities                                                    |
+| 13  | Professional, scientific and technical activities                         |
+| 14  | Administrative and support services activities                            |
+| 15  | Public administration and defense; mandatory social security plans        |
+| 16  | Teaching                                                                  |
+| 17  | Human health care and social assistance activities                        |
+| 18  | Artistic, entertainment and recreational activities                       |
+| 19  | Other service activities                                                  |
+| 20  | Households as employers                                                   |
+| 21  | Activities of extraterritorial organizations and bodies                   |
+| 99  | They cannot be classified according to economic activity                  |
+
+**household_head**
+
+|     |                                        |
+|-----|----------------------------------------|
+| 1   | Boss                                   |
+| 2   | Spouse or partner                      |
+| 3   | Child                                  |
+| 4   | stepson                                |
+| 5   | Son in law daughter in law             |
+| 6   | Grandson                               |
+| 7   | Father or mother                       |
+| 8   | Father-in-law                          |
+| 9   | Brother                                |
+| 10  | Brother-in-law                         |
+| 11  | Other family member                    |
+| 12  | Other non-family member                |
+| 13  | Domestic service or your family member |
+| 14  | Pensioner or his or her family member  |
+| 99  | Ignored                                |
+
+**loc_birth**
+
+|     |                                                    |
+|-----|----------------------------------------------------|
+| 0   | In the same canton of residence                    |
+| 1   | In another canton of residence                     |
+| 2   | In Nicaragua                                       |
+| 3   | In another Central American country                |
+| 4   | In another country in the world                    |
+| 8   | In another country, but does not declare which one |
+| 9   | unknown birthplace                                 |
+
+**loc_two_yrs**
+
+|     |                        |
+|-----|------------------------|
+| 0   | Under 2 years          |
+| 1   | Central Region         |
+| 2   | Chorotega Region       |
+| 3   | Central Pacific Region |
+| 4   | Brunca Region          |
+| 5   | Huetar Atlantic Region |
+| 6   | Huetar North Region    |
+| 7   | In other country       |
+| 9   | Ignored                |
+
+**loc_curr**
+
+|     |                  |
+|-----|------------------|
+| 1   | Central          |
+| 2   | Chorotega        |
+| 3   | Central Pacific  |
+| 4   | Brunca           |
+| 5   | Huetar Atlantica |
+| 6   | North Huetar     |
+
+**loc_curr_type**
+
+|     |       |
+|-----|-------|
+| 1   | Urban |
+| 2   | Rural |
+
+**rec_bonus**
+
+| Worth | Category |
+|-------|----------|
+| 1     | Yes      |
+| 2     | No       |
+| 9     | Ignored  |
+
+**rec_job_search**
+
+|     |                                               |
+|-----|-----------------------------------------------|
+| 1   | Yes, because I didn't have a job at the time. |
+| 2   | Yes, because the work you have is finished    |
+| 3   | Yes, to change the job you have               |
+| 4   | Yes, to have a side job                       |
+| 5   | No                                            |
+| 9   | Ignored                                       |
+
+**edu_attend**
+
+|     |                                                                     |
+|-------------------|-----------------------------------------------------|
+| 0   | Does not attend                                                     |
+| 1   | Maternal, interactive, daycare                                      |
+| 2   | Transition or preparatory                                           |
+| 3   | School                                                              |
+| 4   | School                                                              |
+| 5   | Parauniversity                                                      |
+| 6   | University                                                          |
+| 7   | special teaching                                                    |
+| 8   | Other type of formal education (open education, IPEC, CINDEA, etc.) |
+| 9   | Informal education                                                  |
+| 99  | Ignored                                                             |
+
+**ipsbt**
+
+The main income total net salary is defined as the sum of the main income gross monetary salary plus the total main non-monetary salary.
+
+## Social Exclusion Variables
+
+|              |                                |                                                |
+|------------------|----------------------|---------------------------------|
+| **IPM_E1**   | IPM Education 1                | Non-attendance in formal education             |
+| **IPM_E2**   | IPM Education 2                | Educational lag                                |
+| **IPM_E3**   | IPM Education 3                | No high school attainment                      |
+| **IPM_E4**   | IPM Education 4                | Low development of human capital               |
+| **IPM_VUI1** | IPM Housing and internet use 1 | Poor condition of the roof or floor            |
+| **IPM_VUI2** | IPM Housing and internet use 2 | Poor condition of the exterior walls           |
+| **IPM_VUI3** | IPM Housing and internet use 3 | Overcrowding                                   |
+| **IPM_VUI4** | IPM Housing and internet use 4 | No Internet use                                |
+| **IPM_S1**   | IPM Health 1                   | Without health insurance                       |
+| **IPM_S2**   | IPM Health 2                   | No water service                               |
+| **IPM_S3**   | IPM Health 3                   | Without elimination of excreta                 |
+| **IPM_S4**   | IPM Health 4                   | No Garbage Disposal                            |
+| **IPM_T1**   | IPM Job 1                      | Long-term unemployment and discouraged people  |
+| **IPM_T2.1** | IPM Labor 2.1                  | Non-compliance with minimum wage               |
+| **IPM_T2.2** | IPM Labor 2.2                  | Non-compliance with other labor rights         |
+| **IPM_T3**   | IPM Job 3                      | Informal self-employment                       |
+| **IPM_PS1**  | IPM Social Protection 1        | Early childhood without care                   |
+| **IPM_PS2**  | IPM Social Protection 2        | Older adults without pension                   |
+| **IPM_PS3**  | IPM Social Protection 3        | People with disabilities without transfers     |
+| **IPM_PS4**  | IPM Social Protection 4        | Out of the workforce due to family obligations |
+
+## Regression with Covariates
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+models <- list()
+models[['Nicaraguan Migrant']] = lm(social_exclusion + loc_curr_type + edu_attend ~ nic, cr)
+models[['Inter-Community Contact']] = lm(social_exclusion + loc_curr_type + edu_attend ~ contact, cr_nic)
+models[['Recent Migration']] = lm(social_exclusion + loc_curr_type + edu_attend~ rec_mig, cr_nic)
+models[['Head of Household']] = lm(social_exclusion + loc_curr_type + edu_attend ~ head_of_house, cr_nic)
+
+modelsummary(
+  models,
+  estimate  = "{estimate}{stars} ({std.error})",
+             statistic = NULL,
+  gof_omit = 'IC|RMSE|Log|F|R2$|Std.')
+```
